@@ -143,10 +143,14 @@ namespace Duplicati.Library.Main.Strings
         public static string BlocksizeShort { get { return LC.L(@"Block size used in hashing"); } }
         public static string ChangedfilesLong { get { return LC.L(@"This option can be used to limit the scan to only files that are known to have changed. This is usually only activated in combination with a filesystem watcher that keeps track of file changes."); } }
         public static string ChangedfilesShort { get { return LC.L(@"List of files to examine for changes"); } }
+		public static string ChangedfilesFileLong { get { return LC.L(@"This option can be used to limit the scan to the absolute file paths contained in the file given by an absolute path to this option. This overrides the non-file equivalent option"); } }
+		public static string ChangedfilesFileShort { get { return LC.L(@"Path to a file containng a list of files to examine for changes"); } }
         public static string DbpathLong { get { return LC.L(@"Path to the file containing the local cache of the remote file database"); } }
         public static string DbpathShort { get { return LC.L(@"Path to the local state database"); } }
         public static string DeletedfilesLong(string optionname) { return LC.L(@"This option can be used to supply a list of deleted files. This option will be ignored unless the option --{0} is also set.", optionname); }
         public static string DeletedfilesShort { get { return LC.L(@"List of deleted files"); } }
+		public static string DeletedfilesFileLong(string optionname) { return LC.L(@"This option can be used to supply an absolute path to a file containing a list of deleted absolute file paths. This option will be ignored unless the option --{0} or its file equivalent is also set. This option overrides the non-file equivalent option.", optionname); }
+		public static string DeletedfilesFileShort { get { return LC.L(@"File containing a list of deleted files"); } }
         public static string DisablefilepathcacheLong { get { return LC.L(@"This option can be used to reduce the memory footprint by not keeping paths and modification timestamps in memory"); } }
         public static string DisablefilepathcacheShort { get { return LC.L(@"Reduce memory footprint by disabling in-memory lookups"); } }
         public static string UseblockcacheShort { get { return LC.L(@"This option can be used to increase speed in exchange for extra memory use."); } }

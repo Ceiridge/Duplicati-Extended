@@ -218,8 +218,24 @@ namespace Duplicati.Library.Main.Operation
 
                 if (options.ChangedFilelist != null && options.ChangedFilelist.Length >= 1)
                 {
-                    await database.AppendFilesFromPreviousSetAsync(options.DeletedFilelist);
-                }
+                    // await database.AppendFilesFromPreviousSetAsync(options.DeletedFilelist);
+					HashSet<string> deleteFileList = new HashSet<string>(options.DeletedFilelist ?? new string[]{});
+					HashSet<string> changedFileList = new HashSet<string>(options.ChangedFilelist);
+
+                    await database.AppendFilesFromPreviousSetWithPredicateAsync((path, fileSize) => {
+						// TODO: Check if this actually matches, because of absolute paths
+						if (deleteFileList.Contains(path)) {
+							return true;
+						}
+
+						if (fileSize >= 0) {
+							stats.AddExaminedFile(fileSize);
+						}
+
+                        // Exclude all files from the changed file list
+						return changedFileList.Contains(path);
+					});
+				}
                 else if (journalService != null)
                 {
                     // append files from previous fileset, unless part of modifiedSources, which we've just scanned

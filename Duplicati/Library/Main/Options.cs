@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using Duplicati.Library.Interface;
 using Duplicati.Library.Utility;
 using System.Globalization;
+using System.IO;
+using System.Text;
 
 namespace Duplicati.Library.Main
 {
@@ -347,8 +349,12 @@ namespace Duplicati.Library.Main
                     new CommandLineArgument("skip-restore-verification", CommandLineArgument.ArgumentType.Boolean, Strings.Options.SkiprestoreverificationShort, Strings.Options.SkiprestoreverificationLong, "false"),
                     new CommandLineArgument("disable-filepath-cache", CommandLineArgument.ArgumentType.Boolean, Strings.Options.DisablefilepathcacheShort, Strings.Options.DisablefilepathcacheLong, "true", null, null, @"The ""disable-filepath-cache"" option is no longer used and has been deprecated."),
                     new CommandLineArgument("use-block-cache", CommandLineArgument.ArgumentType.Boolean, Strings.Options.UseblockcacheShort, Strings.Options.UseblockcacheLong, "false"),
+
                     new CommandLineArgument("changed-files", CommandLineArgument.ArgumentType.Path, Strings.Options.ChangedfilesShort, Strings.Options.ChangedfilesLong),
+					new CommandLineArgument("changed-files-file", CommandLineArgument.ArgumentType.Path, Strings.Options.ChangedfilesFileShort, Strings.Options.ChangedfilesFileLong),
                     new CommandLineArgument("deleted-files", CommandLineArgument.ArgumentType.Path, Strings.Options.DeletedfilesShort, Strings.Options.DeletedfilesLong("changed-files")),
+					new CommandLineArgument("deleted-files-file", CommandLineArgument.ArgumentType.Path, Strings.Options.DeletedfilesFileShort, Strings.Options.DeletedfilesFileLong("changed-files")),
+
                     new CommandLineArgument("disable-synthetic-filelist", CommandLineArgument.ArgumentType.Boolean, Strings.Options.DisablesyntheticfilelistShort, Strings.Options.DisablesyntehticfilelistLong, "false"),
 
                     new CommandLineArgument("threshold", CommandLineArgument.ArgumentType.Integer, Strings.Options.ThresholdShort, Strings.Options.ThresholdLong, DEFAULT_THRESHOLD.ToString()),
@@ -1423,14 +1429,24 @@ namespace Duplicati.Library.Main
                 return Convert.ToInt64(v);
             }
         }
-        
+
+		private string[] cachedChangedFileList = null;
+		private string[] cachedDeletedFileList = null;
+
         /// <summary>
         /// List of files to check for changes
         /// </summary>
         public string[] ChangedFilelist
         {
-            get
-            {
+            get {
+				if (this.cachedChangedFileList != null)
+					return this.cachedChangedFileList;
+
+				this.m_options.TryGetValue("changed-files-file", out string filesFile);
+				if (!string.IsNullOrEmpty(filesFile)) {
+					return this.cachedChangedFileList = File.ReadAllLines(filesFile, Encoding.UTF8);
+				}
+
                 string v;
                 m_options.TryGetValue("changed-files", out v);
                 if (string.IsNullOrEmpty(v))
@@ -1447,6 +1463,14 @@ namespace Duplicati.Library.Main
         {
             get
             {
+				if (this.cachedDeletedFileList != null)
+					return this.cachedDeletedFileList;
+
+				this.m_options.TryGetValue("deleted-files-file", out string filesFile);
+				if (!string.IsNullOrEmpty(filesFile)) {
+					return this.cachedDeletedFileList = File.ReadAllLines(filesFile, Encoding.UTF8);
+				}
+
                 string v;
                 m_options.TryGetValue("deleted-files", out v);
                 if (string.IsNullOrEmpty(v))
